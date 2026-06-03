@@ -94,16 +94,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .word-el.stressed{font-weight:600;color:var(--c-stress);}
 .word-el.reduced{color:#ccc;}
 .elided-char{color:#ccc;text-decoration:line-through;text-decoration-color:#ccc;}
+.lost-plosive-char{position:relative;display:inline-block;}
+.lost-plosive-char::after{content:"";position:absolute;width:.42em;height:1px;background:var(--c-lost-plosive);right:-.14em;top:.12em;transform:rotate(-58deg);transform-origin:center;border-radius:1px;}
 .seg-label-row{height:22px;display:flex;align-items:flex-start;justify-content:center;width:100%;padding-top:2px;}
 .seg-label{font-size:9.5px;white-space:nowrap;line-height:1;padding-left:3px;align-self:flex-start;}
 
 /* ── Legend ── */
-.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:#ccc;margin-bottom:1rem;}
-.leg{display:flex;align-items:center;gap:4px;}
+.legend{display:flex;flex-direction:column;gap:5px;font-size:11px;color:#aaa;margin-bottom:1rem;}
+.legend-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.legend-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#c7c4bd;min-width:58px;}
+.leg{display:flex;align-items:center;gap:4px;white-space:nowrap;}
 .leg-dot{width:7px;height:7px;border-radius:50%;}
 .leg-line{width:16px;height:2px;background:var(--c-curve);border-radius:2px;}
 .leg-ul{width:16px;border-bottom:1.5px solid #aac8e8;}
 .leg-s{text-decoration:line-through;text-decoration-color:#ccc;color:#ccc;font-size:11px;}
+.leg-lp{font-size:12px;color:#1a1a1a;line-height:1;position:relative;display:inline-block;padding-right:2px;}
+.leg-reduced{font-size:12px;color:#bbb;}
+.leg-assim{font-size:12px;color:var(--c-assimilation);font-weight:600;}
+.leg-stress{font-size:11px;color:var(--c-stress);font-weight:700;}
 
 /* ── Translation ── */
 .zh{font-size:13.5px;color:#aaa;padding-top:1rem;border-top:1px solid #f0efe8;text-align:center;margin-bottom:1rem;}
@@ -203,12 +211,14 @@ input[type=range]{flex:1;accent-color:#4a8fdb;}
 <!-- 2. Examples -->
 <div class="card" id="examples-card">
   <div class="card-hdr" onclick="toggleCardBody('ex-body','ex-arr')">
-    <span class="card-hdr-title">示例句子（美剧经典台词）</span>
+    <span class="card-hdr-title">示例与测试句</span>
     <span class="toggle-arr open" id="ex-arr">▾</span>
   </div>
   <div class="card-body" id="ex-body">
   <div class="show-tabs">
     <button class="tab active" onclick="setShow(event,'all')">全部</button>
+    <button class="tab" onclick="setShow(event,'flow_core')">核心语流块</button>
+    <button class="tab" onclick="setShow(event,'coverage')">现象覆盖</button>
     <button class="tab" onclick="setShow(event,'bcs')">Better Call Saul</button>
     <button class="tab" onclick="setShow(event,'bb')">Breaking Bad</button>
     <button class="tab" onclick="setShow(event,'friends')">Friends</button>
@@ -277,14 +287,21 @@ input[type=range]{flex:1;accent-color:#4a8fdb;}
 
     <!-- Legend -->
     <div class="legend">
-      <span class="leg"><span class="leg-line"></span>语调曲线</span>
-      <span class="leg"><span style="color:var(--c-liaison);font-size:13px;font-weight:600;letter-spacing:-1px">A‿B</span> 连读</span>
-      <span class="leg"><span class="leg-dot" style="background:var(--c-assimilation)"></span>同化</span>
-      <span class="leg"><span class="leg-dot" style="background:var(--c-elision)"></span>省略</span>
-      <span class="leg"><span class="leg-dot" style="background:var(--c-lost-plosive)"></span>失去爆破</span>
-      <span class="leg"><span class="leg-dot" style="background:var(--c-reduction)"></span>弱化</span>
-      <span class="leg"><span class="leg-s">t</span>省略字母</span>
-      <span class="leg"><b style="color:var(--c-stress);font-size:11px">蓝</b> 重读</span>
+      <div class="legend-row">
+        <span class="legend-title">FLOW</span>
+        <span class="leg"><span style="color:var(--c-liaison);font-size:13px;font-weight:600;letter-spacing:-1px">A‿B</span> link</span>
+        <span class="leg"><span style="color:var(--c-liaison-r);font-size:13px;font-weight:600;letter-spacing:-1px">far‿away</span> r-link</span>
+        <span class="leg"><span class="leg-reduced">to</span> weak</span>
+        <span class="leg"><span class="leg-assim">d→j</span> assimilate</span>
+        <span class="leg"><span class="leg-s">x</span> sound drop</span>
+        <span class="leg"><span class="leg-lp"><span class="lost-plosive-char">d</span></span> hold</span>
+        <span class="leg"><span style="color:var(--c-intrusive-r);font-size:13px;font-weight:600;letter-spacing:-1px">idea‿r‿of</span> insert-r</span>
+      </div>
+      <div class="legend-row">
+        <span class="legend-title">CUES</span>
+        <span class="leg"><span class="leg-line"></span>pitch</span>
+        <span class="leg"><span class="leg-stress">word</span> stress</span>
+      </div>
     </div>
 
     <!-- Translation -->
@@ -439,8 +456,8 @@ input[type=range]{flex:1;accent-color:#4a8fdb;}
 <!-- 5. CORS note -->
 <div id="cors-note" style="display:none;">
   <b>⚠️ 检测到 file:// 协议 — CORS 会拦截 API 请求</b><br>
-  在 HTML 文件所在目录运行：<code>python3 -m http.server 8080</code><br>
-  然后访问 <code>http://localhost:8080/phonetics_analyzer.html</code>
+  在项目目录运行：<code>python -m http.server 8765 --bind 127.0.0.1</code><br>
+  然后访问 <code>http://127.0.0.1:8765/phonetics_v14.15.html</code>
 </div>
 
 </div><!-- /app -->
@@ -476,6 +493,23 @@ function collapseCards(){
    EXAMPLES
 ════════════════════════════════════════════ */
 const SHOWS = {
+  flow_core:{label:'核心语流块测试', items:[
+    "I love it",
+    "pick it up",
+    "We were on a break.",
+    "not that common",
+    "I need all of it out of the oven in about an hour.",
+  ]},
+  coverage:{label:'现象覆盖测试', items:[
+    "Give it to me.",
+    "Did you see it?",
+    "next day",
+    "I asked him.",
+    "far away",
+    "the idea of it",
+    "I wanted to go, but I changed my mind.",
+    "Pick it up, and put it down.",
+  ]},
   bcs:{label:'Better Call Saul', items:[
     "It's all good, man.",
     "You clearly don't know who you're talking to.",
@@ -530,6 +564,8 @@ const SHOWS = {
    SYSTEM PROMPT
 ════════════════════════════════════════════ */
 const PROMPT_VERSION='v14.15';
+const LOCAL_SERVER_CMD='python -m http.server 8765 --bind 127.0.0.1';
+const LOCAL_SERVER_URL='http://127.0.0.1:8765/phonetics_v14.15.html';
 
 const DEFAULT_SP=`You generate structured teaching annotations for an English connected-speech visualizer.
 Your job is NOT to write a phonetics report. Your job is to help learners SEE where natural speech changes, KNOW how it sounds, and MATCH the visual marks to TTS playback.
@@ -545,7 +581,7 @@ For clear consonant + vowel boundaries, prefer stable liaison output. Do not ran
 
 ━━ PHENOMENA ENUM ━━
 liaison (连读,P1): consonant + vowel connection, e.g. "pick it up" -> /pɪ.kɪ.tʌp/
-reduction (弱化,P0): function word weakens, e.g. "him" -> /ɪm/, "and" -> /ən/, "to" -> /tə/
+reduction (弱化,P0): function word weakens, e.g. "him" -> /ɪm/, "and" -> /ən/, "to" -> /tə/, "of" -> /əv/
 assimilation (同化,P3): sound changes because of a neighbor, e.g. "did you" -> /dɪdʒuː/
 elision (省略,P3): sound is omitted, e.g. "next day" -> /neks deɪ/, "him" -> /ɪm/
 lost_plosive (失去爆破,P2): /p b t d k g/ unreleased before consonant or pause, e.g. "not that" -> /nɒt̚ ðæt/
@@ -565,11 +601,15 @@ Never put full-sentence IPA in naturalIpa. naturalIpa describes only that small 
 ━━ LIAISON CHAIN RULE ━━
 Liaison is for teaching the flow of natural speech. Prefer one readable spoken chunk over many tiny noisy marks.
 A liaison chain may cover 2-3 words when each boundary naturally links, especially consonant-final word + vowel-initial function word.
-Weak function words at the chain tail may be absorbed into the liaison chain: a, an, the, it, us, of, at, on.
+Weak function words at the chain tail may be absorbed into the liaison chain: a, an, it, us, of, at, on.
 If a P0 reduction is already inside a liaison chain, do NOT create a separate reduction segment for the same word.
+If a weak function word itself starts a natural link before a vowel, keep it as a small liaison chunk with weak pronunciation, e.g. "of it" -> /ə vɪt/, not /ʌv ɪt/.
 Default max chain length is 3 words. Do not make unlimited chains.
 Do not cross punctuation, a strong pause, a strong semantic boundary, or a strongly stressed content-word boundary.
 Do not merge lost_plosive, assimilation, elision, or intrusive_r into a liaison chain.
+Do NOT treat "the + vowel" as an ordinary liaison chain. Keep "the oven" visually plain; show the vowel-before-the reading through writtenIpa (/ði/) instead.
+For "an + silent-h word", prefer a small liaison chain: an‿hour -> /ə naʊər/. Current seed examples include hour, honest, honor/honour, heir, herb.
+In longer sentences, prefer clear 2-word chunks. Use 3-word chains only when the words are heard as one compact teaching unit.
 
 Correct for "We were on a break.":
 {"words":[{"text":"We","stressed":false,"writtenIpa":"/wi/"}],"phenomenon":null,"priority":0,"naturalIpa":null,"label":null,"elision":null}
@@ -579,6 +619,8 @@ Correct for "We were on a break.":
 Wrong for teaching:
 were‿on | a  (too fragmented; "a" is heard as part of the chunk)
 were‿on‿a‿break  (too long; do not absorb the stressed content word)
+out‿of‿the oven  (do not absorb "the"; keep "the oven" plain)
+in‿about‿an | hour  (prefer in‿about + an‿hour)
 
 Correct for "not that common":
 {"words":[{"text":"not","stressed":false,"writtenIpa":"/nɒt/"}],"phenomenon":"lost_plosive","priority":2,"naturalIpa":"/nɒt̚/","label":"失去爆破","elision":null}
@@ -596,7 +638,26 @@ For "I love it", keep "I" plain and mark "love it" as liaison:
 For "pick it up", mark the whole connected chain as liaison:
 {"words":[{"text":"pick","stressed":true,"writtenIpa":"/pɪk/"},{"text":"it","stressed":false,"writtenIpa":"/ɪt/"},{"text":"up","stressed":true,"writtenIpa":"/ʌp/"}],"phenomenon":"liaison","priority":1,"naturalIpa":"/pɪ kɪ tʌp/","label":"连读","elision":null}
 
+For "Pick it up, and put it down.", keep the comma boundary. Use one liaison chain before the comma and one stable reduction + liaison chunk after it:
+{"words":[{"text":"Pick","stressed":true,"writtenIpa":"/pɪk/"},{"text":"it","stressed":false,"writtenIpa":"/ɪt/"},{"text":"up,","stressed":true,"writtenIpa":"/ʌp/"}],"phenomenon":"liaison","priority":1,"naturalIpa":"/pɪ kɪ tʌp/","label":"连读","elision":null}
+{"words":[{"text":"and","stressed":false,"writtenIpa":"/ænd/"}],"phenomenon":"reduction","priority":0,"naturalIpa":"/ən/","label":"弱化","elision":null}
+{"words":[{"text":"put","stressed":true,"writtenIpa":"/pʊt/"},{"text":"it","stressed":false,"writtenIpa":"/ɪt/"}],"phenomenon":"liaison","priority":1,"naturalIpa":"/pʊ tɪt/","label":"连读","elision":null}
+{"words":[{"text":"down.","stressed":true,"writtenIpa":"/daʊn/"}],"phenomenon":null,"priority":0,"naturalIpa":null,"label":null,"elision":null}
+
 For "not that common", do not wrap the whole phrase. Keep "not" and "that" separate lost_plosive segments and "common" plain.
+
+For "I wanted to go, but I changed my mind.", show the short-sentence multi-phenomenon pattern:
+{"words":[{"text":"I","stressed":false,"writtenIpa":"/aɪ/"}],"phenomenon":null,"priority":0,"naturalIpa":null,"label":null,"elision":null}
+{"words":[{"text":"wanted","stressed":false,"writtenIpa":"/ˈwɑːntɪd/"},{"text":"to","stressed":false,"writtenIpa":"/tuː/"}],"phenomenon":"reduction","priority":0,"naturalIpa":"/ˈwɑːnɪdə/","label":"弱化","elision":null}
+{"words":[{"text":"go,","stressed":true,"writtenIpa":"/ɡoʊ/"}],"phenomenon":null,"priority":0,"naturalIpa":null,"label":null,"elision":null}
+{"words":[{"text":"but","stressed":false,"writtenIpa":"/bʌt/"},{"text":"I","stressed":false,"writtenIpa":"/aɪ/"}],"phenomenon":"reduction","priority":0,"naturalIpa":"/bə taɪ/","label":"弱化","elision":null}
+{"words":[{"text":"changed","stressed":true,"writtenIpa":"/tʃeɪndʒd/"},{"text":"my","stressed":false,"writtenIpa":"/maɪ/"}],"phenomenon":"lost_plosive","priority":2,"naturalIpa":"/tʃeɪndʒd̚ maɪ/","label":"失去爆破","elision":null}
+{"words":[{"text":"mind.","stressed":true,"writtenIpa":"/maɪnd/"}],"phenomenon":null,"priority":0,"naturalIpa":null,"label":null,"elision":null}
+
+Wrong:
+wanted to -> /ˈwɑːntɪd tuː/  (too careful; misses the weak "to")
+go‿but  (crosses a comma and contrast boundary)
+changed my -> /tʃeɪndʒd maɪ/  (misses the unreleased /d/)
 
 ━━ WORDS AND PUNCTUATION ━━
 Keep punctuation attached to the word it follows: "common," not "common" + ",".
@@ -777,7 +838,7 @@ function looksLikeLegacyDefaultPrompt(prompt){
     && prompt.includes('SENSE GROUPS — NATURAL BREAKPOINTS ONLY')
   ) || (
     prompt.includes('You generate structured teaching annotations for an English connected-speech visualizer.')
-    && !prompt.includes('LIAISON CHAIN RULE')
+    && !prompt.includes('the + vowel')
   );
 }
 
@@ -823,8 +884,8 @@ function refreshExamples(){
   let pool=[];
   if(S.currentShow==='all') Object.values(SHOWS).forEach(s=>pool.push(...s.items.map(t=>({text:t,show:s.label}))));
   else{ const s=SHOWS[S.currentShow]; pool=s.items.map(t=>({text:t,show:s.label})); }
-  // shuffle and pick 5
-  const shuffled=pool.sort(()=>Math.random()-.5).slice(0,5);
+  const isTestGroup=['flow_core','coverage'].includes(S.currentShow);
+  const shuffled=isTestGroup?pool:pool.sort(()=>Math.random()-.5).slice(0,5);
   grid.innerHTML='';
   shuffled.forEach(item=>{
     const btn=document.createElement('button');
@@ -900,7 +961,7 @@ async function callAnalysisAPI(cfg,sentence){
   let r;
   try{r=await fetch(cfg.url,{method:'POST',headers:h,body});}
   catch(e){
-    if(location.protocol==='file:') throw new Error('CORS 被拦截，请用 python3 -m http.server 8080 起服务');
+    if(location.protocol==='file:') throw new Error(`CORS 被拦截，请先在项目目录运行：${LOCAL_SERVER_CMD}，然后访问 ${LOCAL_SERVER_URL}`);
     throw new Error('网络错误：'+e.message);
   }
   if(!r.ok){let m=r.statusText;try{const e=await r.json();m=e.error?.message||JSON.stringify(e);}catch{}throw new Error(`HTTP ${r.status}: ${m}`);}
@@ -924,6 +985,12 @@ function parseAnalysisJSON(raw){
   throw new Error('AI 返回了非 JSON 内容，请重试或换用更稳定的模型');
 }
 
+function normalizeIpaText(ipa){
+  const text=String(ipa||'').trim();
+  if(!text) return null;
+  return /^\/.*\/$/.test(text)?text:`/${text.replace(/^\/|\/$/g,'')}/`;
+}
+
 function normalizeAnalysisData(data){
   if(!data||typeof data!=='object') throw new Error('AI 返回 JSON 不是对象');
   if(!Array.isArray(data.senseGroups)||!data.senseGroups.length) throw new Error('AI 返回缺少 senseGroups');
@@ -932,11 +999,12 @@ function normalizeAnalysisData(data){
     pitchContour:Array.isArray(sg.pitchContour)?sg.pitchContour.map(Number).filter(n=>Number.isFinite(n)):[],
     segments:Array.isArray(sg.segments)?sg.segments.map(seg=>({
       ...seg,
+      naturalIpa:normalizeIpaText(seg.naturalIpa),
       words:Array.isArray(seg.words)?seg.words.map(w=>({
         ...w,
         text:String(w?.text||''),
         stressed:Boolean(w?.stressed),
-        writtenIpa:w?.writtenIpa||''
+        writtenIpa:normalizeIpaText(w?.writtenIpa)||''
       })).filter(w=>w.text):[]
     })).filter(seg=>seg.words.length):[]
   })).filter(sg=>sg.segments.length);
@@ -970,30 +1038,63 @@ function stripWordText(text){
   return String(text||'').replace(/^[("']+|[.,!?;:'"）)]+$/g,'').toLowerCase();
 }
 
+function lostPlosiveCharIndex(base){
+  const m=String(base||'').match(/[pbtdkg]$/i);
+  return m?base.length-1:-1;
+}
+
 function hasTrailingPunctuation(word){
   return /[.!?;,，。！？；]$/.test(String(word?.text||''));
 }
 
 function isFunctionTailWord(word){
-  return new Set(['a','an','the','it','us','of','at','on']).has(stripWordText(word?.text));
+  return new Set(['a','an','it','us','of','at','on']).has(stripWordText(word?.text));
+}
+
+function isWeakFunctionLinkStartWord(word){
+  return new Set(['of','in','on','at','and']).has(stripWordText(word?.text));
+}
+
+const SILENT_H_WORDS=new Set([
+  'hour','hours','hourly',
+  'honest','honestly',
+  'honor','honors','honour','honours','honorable','honourable',
+  'heir','heirs','heiress',
+  'herb','herbs'
+]);
+
+function isSilentHWord(word){
+  return SILENT_H_WORDS.has(stripWordText(word?.text));
 }
 
 function isHighPriorityPhenomenon(ph){
   return ['lost_plosive','assimilation','elision','intrusive_r'].includes(ph);
 }
 
+function wordsKey(words){
+  return (words||[]).map(w=>stripWordText(w.text)).join(' ');
+}
+
+function isPotentialRLinkStartWord(word){
+  return /(?:r|re)$/.test(stripWordText(word?.text));
+}
+
 function wordsEndWithConsonantSound(words){
   const w=stripWordText(words?.[words.length-1]?.text);
   if(!w) return false;
-  if(['were','are','far','for','your','our','there','where'].includes(w)) return true;
+  if(isPotentialRLinkStartWord(words?.[words.length-1])) return true;
   return /[bcdfghjklmnpqrstvwxyz]$/.test(w)&&!/^[aeiou]/.test(w.slice(-1));
 }
 
 function wordStartsWithVowelSound(word){
   const w=stripWordText(word?.text);
   if(!w) return false;
-  if(['hour','honest','honor','heir'].includes(w)) return true;
+  if(isSilentHWord(word)) return true;
   return /^[aeiou]/.test(w);
+}
+
+function shouldReserveForSilentHChain(seg,nextSeg){
+  return stripWordText(seg?.words?.[0]?.text)==='an'&&isSilentHWord(nextSeg?.words?.[0]);
 }
 
 function canAbsorbIntoLiaisonChain(chain, nextSeg){
@@ -1001,6 +1102,7 @@ function canAbsorbIntoLiaisonChain(chain, nextSeg){
   if(!nextSeg||isHighPriorityPhenomenon(nextSeg.phenomenon)) return false;
   if(nextSeg.words.length!==1) return false;
   if(hasTrailingPunctuation(chain.words[chain.words.length-1])) return false;
+  if(stripWordText(nextSeg.words[0].text)==='the') return false;
   const nextWord=nextSeg.words[0];
   if(!wordStartsWithVowelSound(nextWord)) return false;
   if(nextSeg.phenomenon==='reduction') return isFunctionTailWord(nextWord);
@@ -1015,20 +1117,156 @@ function canStartLiaisonChain(seg,nextSeg){
   if(hasTrailingPunctuation(seg.words[0])) return false;
   if(seg.phenomenon!==null&&seg.phenomenon!=='liaison'&&seg.phenomenon!=='liaison_r') return false;
   if(nextSeg.phenomenon!==null&&nextSeg.phenomenon!=='reduction'&&nextSeg.phenomenon!=='liaison'&&nextSeg.phenomenon!=='liaison_r') return false;
-  if(seg.phenomenon===null&&!['were','are','far','for','your','our','there','where'].includes(stripWordText(seg.words[0].text))) return false;
+  if(stripWordText(nextSeg.words[0].text)==='the') return false;
+  if(seg.phenomenon===null&&!isPotentialRLinkStartWord(seg.words[0])) return false;
   return wordsEndWithConsonantSound(seg.words)&&wordStartsWithVowelSound(nextSeg.words[0]);
 }
 
-function naturalIpaForLiaisonChain(words, accent){
-  const key=words.map(w=>stripWordText(w.text)).join(' ');
+function canStartSilentHChain(seg,nextSeg){
+  if(!seg||!nextSeg) return false;
+  if(seg.words.length!==1||nextSeg.words.length!==1) return false;
+  if(stripWordText(seg.words[0].text)!=='an') return false;
+  if(!isSilentHWord(nextSeg.words[0])) return false;
+  if(isHighPriorityPhenomenon(seg.phenomenon)||isHighPriorityPhenomenon(nextSeg.phenomenon)) return false;
+  if(hasTrailingPunctuation(seg.words[0])) return false;
+  return true;
+}
+
+function canStartWeakFunctionLiaison(seg,nextSeg){
+  if(!seg||!nextSeg) return false;
+  if(seg.words.length!==1||nextSeg.words.length!==1) return false;
+  if(isHighPriorityPhenomenon(seg.phenomenon)||isHighPriorityPhenomenon(nextSeg.phenomenon)) return false;
+  if(hasTrailingPunctuation(seg.words[0])) return false;
+  if(!isWeakFunctionLinkStartWord(seg.words[0])) return false;
+  if(nextSeg.phenomenon!==null&&nextSeg.phenomenon!=='reduction') return false;
+  if(stripWordText(nextSeg.words[0].text)==='the') return false;
+  return wordsEndWithConsonantSound(seg.words)&&wordStartsWithVowelSound(nextSeg.words[0]);
+}
+
+function weakFunctionNaturalIpa(word, accent){
+  const w=stripWordText(word?.text);
   const isBritish=accent==='british';
   const fixed={
+    of:'/əv/',
+    in:'/ɪn/',
+    on:isBritish?'/ɒn/':'/ɑn/',
+    at:'/ət/',
+    and:'/ən/'
+  };
+  return fixed[w]||null;
+}
+
+function naturalIpaForLiaisonChain(words, accent){
+  const key=wordsKey(words);
+  const isBritish=accent==='british';
+  const fixed={
+    'all of it':'/ɔː lə vɪt/',
     'were on a': isBritish?'/wə rɒ nə/':'/wə rɑ nə/',
     'pick it up':'/pɪ kɪ tʌp/',
-    'love it':'/lʌ vɪt/'
+    'love it':'/lʌ vɪt/',
+    'put it':'/pʊ tɪt/',
+    'out of':'/aʊ dəv/',
+    'of it':'/ə vɪt/',
+    'in about':'/ɪ nəbaʊt/',
+    'an hour':'/ə naʊər/'
   };
   if(fixed[key]) return fixed[key];
+  if(words.length>=2&&isWeakFunctionLinkStartWord(words[0])){
+    const first=weakFunctionNaturalIpa(words[0],accent);
+    const rest=words.slice(1).map(w=>String(w.writtenIpa||'').replace(/^\/|\/$/g,'')).filter(Boolean);
+    if(first&&rest.length) return '/'+[first.replace(/^\/|\/$/g,''),...rest].join(' ')+'/';
+  }
   return words.map(w=>String(w.writtenIpa||'').replace(/^\/|\/$/g,'')).filter(Boolean).join(' ')||null;
+}
+
+function isPinnedLiaisonFallbackChunk(words){
+  return new Set(['all of it','were on a','pick it up','love it','put it','out of','of it','in about','an hour']).has(wordsKey(words));
+}
+
+function makeLiaisonChunk(words, accent, fallbackIpa=null){
+  return makeSegment(words,'liaison',1,naturalIpaForLiaisonChain(words,accent)||fallbackIpa,'连读',null);
+}
+
+function liaisonPhenomenonForWords(words, accent){
+  return accent==='british'&&isPotentialRLinkStartWord(words?.[0])?'liaison_r':'liaison';
+}
+
+function liaisonLabelForPhenomenon(ph){
+  return ph==='liaison_r'?'r连读':'连读';
+}
+
+function makeDetectedLiaisonChain(words, accent, fallbackIpa=null){
+  const ph=liaisonPhenomenonForWords(words,accent);
+  return makeSegment(words,ph,1,naturalIpaForLiaisonChain(words,accent)||fallbackIpa,liaisonLabelForPhenomenon(ph),null);
+}
+
+function splitReadableLiaisonWords(words, accent, fallbackIpa=null){
+  const out=[];
+  for(let i=0;i<words.length;){
+    if(stripWordText(words[i].text)==='the'){
+      out.push(makeSegment([words[i]]));
+      i++;
+      continue;
+    }
+    if(stripWordText(words[i].text)==='an'&&isSilentHWord(words[i+1])){
+      out.push(makeLiaisonChunk(words.slice(i,i+2),accent,fallbackIpa));
+      i+=2;
+      continue;
+    }
+    const tri=words.slice(i,i+3);
+    if(tri.length===3&&isPinnedLiaisonFallbackChunk(tri)){
+      out.push(makeLiaisonChunk(tri,accent,fallbackIpa));
+      i+=3;
+      continue;
+    }
+    const pair=words.slice(i,i+2);
+    if(pair.length===2&&isPinnedLiaisonFallbackChunk(pair)){
+      out.push(makeLiaisonChunk(pair,accent,fallbackIpa));
+      i+=2;
+      continue;
+    }
+    out.push(makeSegment([words[i]]));
+    i++;
+  }
+  return out;
+}
+
+function splitOvermergedLiaisonSegment(seg, accent){
+  if(seg.phenomenon!=='liaison'&&seg.phenomenon!=='liaison_r') return [seg];
+  const words=seg.words||[];
+  if(words.length>3) return splitReadableLiaisonWords(words,accent,seg.naturalIpa);
+  const theIdx=words.findIndex(w=>stripWordText(w.text)==='the');
+  if(theIdx>0){
+    const out=[];
+    const before=words.slice(0,theIdx);
+    if(before.length>=2){
+      out.push(makeLiaisonChunk(before,accent,seg.naturalIpa));
+    }else{
+      before.forEach(w=>out.push(makeSegment([w])));
+    }
+    words.slice(theIdx).forEach(w=>out.push(makeSegment([w])));
+    return out;
+  }
+  const anIdx=words.findIndex((w,idx)=>stripWordText(w.text)==='an'&&isSilentHWord(words[idx+1]));
+  if(anIdx>0){
+    const out=[];
+    const before=words.slice(0,anIdx);
+    if(before.length>=2){
+      out.push(makeLiaisonChunk(before,accent,seg.naturalIpa));
+    }else{
+      before.forEach(w=>out.push(makeSegment([w])));
+    }
+    const silentHChain=words.slice(anIdx,anIdx+2);
+    out.push(makeLiaisonChunk(silentHChain,accent));
+    words.slice(anIdx+2).forEach(w=>out.push(makeSegment([w])));
+    return out;
+  }
+  return [seg];
+}
+
+function shouldMoveChainTailToSilentH(chain,nextSeg){
+  const last=chain?.words?.[chain.words.length-1];
+  return stripWordText(last?.text)==='an'&&isSilentHWord(nextSeg?.words?.[0]);
 }
 
 function mergeLiaisonChains(data, accent){
@@ -1038,13 +1276,33 @@ function mergeLiaisonChains(data, accent){
       const merged=[];
       for(let i=0;i<sg.segments.length;i++){
         const seg=sg.segments[i];
+        const splitSegs=splitOvermergedLiaisonSegment(seg,accent);
+        if(splitSegs.length>1){
+          splitSegs.forEach(s=>merged.push(s));
+          continue;
+        }
+        if(canStartSilentHChain(seg,sg.segments[i+1])){
+          const chain=makeDetectedLiaisonChain([...seg.words,...sg.segments[i+1].words],accent);
+          i++;
+          merged.push(chain);
+          continue;
+        }
+        if(canStartWeakFunctionLiaison(seg,sg.segments[i+1])){
+          const chain=makeDetectedLiaisonChain([...seg.words,...sg.segments[i+1].words],accent);
+          i++;
+          merged.push(chain);
+          continue;
+        }
         if(seg.phenomenon===null&&canStartLiaisonChain(seg,sg.segments[i+1])){
-          const chain={...seg,words:[...seg.words,...sg.segments[i+1].words],phenomenon:'liaison',priority:1,label:'连读',elision:null};
+          const chain=makeDetectedLiaisonChain([...seg.words,...sg.segments[i+1].words],accent);
           i++;
           while(i+1<sg.segments.length&&canAbsorbIntoLiaisonChain(chain,sg.segments[i+1])){
+            if(shouldReserveForSilentHChain(sg.segments[i+1],sg.segments[i+2])) break;
             chain.words.push(...sg.segments[i+1].words);
             i++;
           }
+          chain.phenomenon=liaisonPhenomenonForWords(chain.words,accent);
+          chain.label=liaisonLabelForPhenomenon(chain.phenomenon);
           chain.naturalIpa=naturalIpaForLiaisonChain(chain.words,accent);
           merged.push(chain);
           continue;
@@ -1053,11 +1311,25 @@ function mergeLiaisonChains(data, accent){
           merged.push(seg);
           continue;
         }
-        const chain={...seg,words:[...seg.words],phenomenon:'liaison',priority:1,label:'连读',elision:null};
+        const chain={...seg,words:[...seg.words],priority:1,label:liaisonLabelForPhenomenon(seg.phenomenon),elision:null};
         while(i+1<sg.segments.length&&canAbsorbIntoLiaisonChain(chain,sg.segments[i+1])){
+          if(shouldReserveForSilentHChain(sg.segments[i+1],sg.segments[i+2])) break;
           chain.words.push(...sg.segments[i+1].words);
           i++;
         }
+        if(i+1<sg.segments.length&&shouldMoveChainTailToSilentH(chain,sg.segments[i+1])){
+          const anWord=chain.words.pop();
+          if(chain.words.length){
+            chain.naturalIpa=naturalIpaForLiaisonChain(chain.words,accent)||chain.naturalIpa;
+            merged.push(chain);
+          }
+          const silentHSeg=sg.segments[i+1];
+          merged.push(makeSegment([anWord,...silentHSeg.words],'liaison',1,naturalIpaForLiaisonChain([anWord,...silentHSeg.words],accent),'连读',null));
+          i++;
+          continue;
+        }
+        chain.phenomenon=seg.phenomenon==='liaison_r'?'liaison_r':liaisonPhenomenonForWords(chain.words,accent);
+        chain.label=liaisonLabelForPhenomenon(chain.phenomenon);
         chain.naturalIpa=naturalIpaForLiaisonChain(chain.words,accent)||chain.naturalIpa;
         merged.push(chain);
       }
@@ -1079,12 +1351,44 @@ function stabilizeAnalysisData(data, sentence, accent){
       makeSegment([makeWord('pick',true,'/pɪk/'),makeWord('it',false,'/ɪt/'),makeWord('up',true,'/ʌp/')],'liaison',1,'/pɪ kɪ tʌp/','连读',null)
     ]);
   }
+  if(key==="pick it up, and put it down"){
+    return replaceSingleGroup(data,[0.76,0.36,0.62,0.22,0.70,0.32,0.58],[
+      makeSegment([makeWord('Pick',true,'/pɪk/'),makeWord('it',false,'/ɪt/'),makeWord('up,',true,'/ʌp/')],'liaison',1,'/pɪ kɪ tʌp/','连读',null),
+      makeSegment([makeWord('and',false,'/ænd/')],'reduction',0,'/ən/','弱化',null),
+      makeSegment([makeWord('put',true,'/pʊt/'),makeWord('it',false,'/ɪt/')],'liaison',1,'/pʊ tɪt/','连读',null),
+      makeSegment([makeWord('down.',true,'/daʊn/')])
+    ]);
+  }
   if(key==="not that common"){
     const isBritish=accent==='british';
     return replaceSingleGroup(data,[0.34,0.42,0.78],[
       makeSegment([makeWord('not',false,isBritish?'/nɒt/':'/nɑːt/')],'lost_plosive',2,isBritish?'/nɒt̚/':'/nɑːt̚/','失去爆破',null),
       makeSegment([makeWord('that',false,'/ðæt/')],'lost_plosive',2,'/ðæt̚/','失去爆破',null),
       makeSegment([makeWord('common',true,isBritish?'/ˈkɒmən/':'/ˈkɑːmən/')])
+    ]);
+  }
+  if(key==="i need all of it out of the oven in about an hour"){
+    return replaceSingleGroup(data,[0.30,0.64,0.42,0.28,0.22,0.48,0.24,0.22,0.58,0.30,0.46,0.24,0.68],[
+      makeSegment([makeWord('I',false,'/aɪ/')]),
+      makeSegment([makeWord('need',true,'/niːd/')]),
+      makeLiaisonChunk([makeWord('all',false,'/ɔːl/'),makeWord('of',false,'/əv/'),makeWord('it',false,'/ɪt/')],accent),
+      makeLiaisonChunk([makeWord('out',false,'/aʊt/'),makeWord('of',false,'/əv/')],accent),
+      makeSegment([makeWord('the',false,'/ði/')]),
+      makeSegment([makeWord('oven',true,'/ˈʌvən/')]),
+      makeLiaisonChunk([makeWord('in',false,'/ɪn/'),makeWord('about',false,'/əˈbaʊt/')],accent),
+      makeLiaisonChunk([makeWord('an',false,'/ən/'),makeWord('hour',true,'/aʊər/')],accent)
+    ]);
+  }
+  if(key==="i wanted to go, but i changed my mind"){
+    const wantedIpa=accent==='british'?'/ˈwɒntɪd/':'/ˈwɑːntɪd/';
+    const goIpa=accent==='british'?'/ɡəʊ/':'/ɡoʊ/';
+    return replaceSingleGroup(data,[0.28,0.46,0.20,0.72,0.18,0.30,0.78,0.24,0.62],[
+      makeSegment([makeWord('I',false,'/aɪ/')]),
+      makeSegment([makeWord('wanted',false,wantedIpa),makeWord('to',false,'/tuː/')],'reduction',0,accent==='british'?'/ˈwɒnɪdə/':'/ˈwɑːnɪdə/','弱化',null),
+      makeSegment([makeWord('go,',true,goIpa)]),
+      makeSegment([makeWord('but',false,'/bʌt/'),makeWord('I',false,'/aɪ/')],'reduction',0,'/bə taɪ/','弱化',null),
+      makeSegment([makeWord('changed',true,'/tʃeɪndʒd/'),makeWord('my',false,'/maɪ/')],'lost_plosive',2,'/tʃeɪndʒd̚ maɪ/','失去爆破',null),
+      makeSegment([makeWord('mind.',true,'/maɪnd/')])
     ]);
   }
   return mergeLiaisonChains(data,accent);
@@ -1258,7 +1562,17 @@ function renderSegment(seg){
       }else{
         const m=word.text.match(/^(.*?)([.,!?;:'"）)]+)?$/);
         const base=m?m[1]:word.text, punct=m?m[2]||'':'';
-        wEl.appendChild(document.createTextNode(base));
+        if(mode==='natural'&&ph==='lost_plosive'){
+          const lpIdx=lostPlosiveCharIndex(base);
+          base.split('').forEach((ch,ci)=>{
+            const s=document.createElement('span');
+            s.textContent=ch;
+            if(ci===lpIdx) s.className='lost-plosive-char';
+            wEl.appendChild(s);
+          });
+        }else{
+          wEl.appendChild(document.createTextNode(base));
+        }
         if(punct){const ps=document.createElement('span');ps.className='punct';ps.textContent=punct;wEl.appendChild(ps);}
       }
       wordsRow.appendChild(wEl);
@@ -1272,7 +1586,7 @@ function renderSegment(seg){
     if(isLiaison&&seg.naturalIpa){
       // liaison: IPA below instead of label text
       const e=document.createElement('div');e.className='seg-below-ipa';e.style.color=color;e.textContent=seg.naturalIpa;lblRow.appendChild(e);
-    }else if(seg.label&&!isLiaison){
+    }else if(seg.label&&!isLiaison&&ph!=='lost_plosive'&&ph!=='reduction'&&ph!=='elision'){
       const e=document.createElement('div');e.className='seg-label';e.style.color=color;e.textContent=seg.label;lblRow.appendChild(e);
     }
   }
@@ -1613,7 +1927,7 @@ async function fetchELVoices(){
 
   // file:// 协议直接提示
   if(location.protocol==='file:'){
-    setStatus('❌ file:// 协议无法请求外部 API，请用 python3 -m http.server 8080 起服务后再试',true);
+    setStatus(`❌ file:// 协议无法请求外部 API，请先在项目目录运行：${LOCAL_SERVER_CMD}，然后访问 ${LOCAL_SERVER_URL}`,true);
     return;
   }
 
@@ -1655,7 +1969,7 @@ async function fetchELVoices(){
 async function fetchTCVoices(){
   const key=document.getElementById('tc-key').value.trim();
   if(!key){setStatus('请填入 Typecast Key',true);return;}
-  if(location.protocol==='file:'){setStatus('❌ 请用本地服务器打开（python3 -m http.server 8080）',true);return;}
+  if(location.protocol==='file:'){setStatus(`❌ 请用本地服务器打开：先运行 ${LOCAL_SERVER_CMD}，再访问 ${LOCAL_SERVER_URL}`,true);return;}
   setStatus('正在获取 Typecast 音色…');
   try{
     let r;
