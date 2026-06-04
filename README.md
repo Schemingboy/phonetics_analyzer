@@ -42,10 +42,11 @@ http://127.0.0.1:8765/index.html
 ```
 .
 ├── index.html              ← 当前主版本（v14.15）
-├── PROJECT.md              ← 项目详细说明与规则
-├── CHANGELOG.md            ← 版本变更记录
-├── AGENTS.md               ← 协作规则（面向 AI 工具）
-└── old version/            ← 历史版本归档
+├── phonetics_v14.15.html   ← 独立版本文件
+├── phonetics_v14.7.html    ← 早期稳定基线
+├── README.md
+├── LICENSE
+└── .gitignore
 ```
 
 ## License
