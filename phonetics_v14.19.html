@@ -960,7 +960,7 @@ function refreshExamples(){
     const btn=document.createElement('button');
     btn.className='ex-btn';
     btn.innerHTML=`<div>${item.text}</div><div class="ex-meta">${item.show}</div>`;
-    btn.onclick=()=>{ document.getElementById('s-input').value=item.text; };
+    btn.onclick=()=>{ document.getElementById('s-input').value=item.text; analyze(); };
     grid.appendChild(btn);
   });
 }
