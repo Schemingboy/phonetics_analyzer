@@ -52,6 +52,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ── Result ── */
 #result-wrap{display:none;}
+#result-wrap.stale{opacity:.35;pointer-events:none;}
 
 /* View toggle + accent */
 .result-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap;}
@@ -96,7 +97,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .word-el{font-size:var(--fs);font-weight:400;color:#1a1a1a;white-space:nowrap;padding:0 var(--wp);line-height:1.25;transition:color .2s;}
 .word-el.stressed{font-weight:600;color:var(--c-stress);}
 .word-el.reduced{color:#ccc;}
-.elided-char{color:#ccc;text-decoration:line-through;text-decoration-color:#ccc;}
+.elided-char{color:var(--c-elision);text-decoration:line-through;text-decoration-color:var(--c-elision);}
 .lost-plosive-char{position:relative;display:inline-block;}
 .lost-plosive-char::after{content:"";position:absolute;width:.42em;height:1px;background:var(--c-lost-plosive);right:-.14em;top:.12em;transform:rotate(-58deg);transform-origin:center;border-radius:1px;}
 .seg-label-row{height:22px;display:flex;align-items:flex-start;justify-content:center;width:100%;padding-top:2px;}
@@ -115,7 +116,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .leg-dot{width:7px;height:7px;border-radius:50%;}
 .leg-line{width:16px;height:2px;background:var(--c-curve);border-radius:2px;}
 .leg-ul{width:16px;border-bottom:1.5px solid #aac8e8;}
-.leg-s{text-decoration:line-through;text-decoration-color:#ccc;color:#ccc;font-size:11px;}
+.leg-s{text-decoration:line-through;text-decoration-color:var(--c-elision);color:var(--c-elision);font-size:11px;}
 .leg-lp{font-size:12px;color:#1a1a1a;line-height:1;position:relative;display:inline-block;padding-right:2px;}
 .leg-reduced{font-size:12px;color:#bbb;}
 .leg-assim{font-size:12px;color:var(--c-assimilation);font-weight:600;}
@@ -851,7 +852,6 @@ const STORE = {
     'tc-key':         'pa_tc_key',
     'accent-sel':     'pa_accent',
     'sp-ta':          'pa_system_prompt',
-    'prompt-version': 'pa_prompt_version',
     'tc-auto-emotion':'pa_tc_auto_emotion',
     'spd':            'pa_spd',
   },
@@ -960,7 +960,7 @@ function refreshExamples(){
     const btn=document.createElement('button');
     btn.className='ex-btn';
     btn.innerHTML=`<div>${item.text}</div><div class="ex-meta">${item.show}</div>`;
-    btn.onclick=()=>{ document.getElementById('s-input').value=item.text; };
+    btn.onclick=()=>{ document.getElementById('s-input').value=item.text; analyze(); };
     grid.appendChild(btn);
   });
 }
@@ -1160,7 +1160,7 @@ function wordHasSchwaCue(word, seg){
   if(!key) return false;
   const source=[word.writtenIpa,seg?.naturalIpa].filter(Boolean).join(' ');
   if(SCHWA_FUNCTION_WORDS.has(key)) return textHasSchwa(source);
-  if(SCHWA_CONTENT_WORDS.has(key)) return textHasSchwa(source)||['about','support','today','again','around','away'].includes(key);
+  if(SCHWA_CONTENT_WORDS.has(key)) return textHasSchwa(source);
   return false;
 }
 
@@ -1707,6 +1707,7 @@ async function analyze(){
   const sentence=document.getElementById('s-input').value.trim(),cfg=getCfg();
   if(!sentence){setStatus('请输入句子');return;}
   if(!cfg.key){setStatus('请在 API 设置中填入 Key',true);return;}
+  document.getElementById('result-wrap').classList.add('stale');
   S.sentence=sentence; stopSpeech();
   document.getElementById('analyze-btn').disabled=true;
   document.getElementById('analyze-btn').textContent='分析中…';
@@ -1717,9 +1718,14 @@ async function analyze(){
     data=stabilizeAnalysisData(data,sentence,getAccent());
     data=fixContrastSenseGroupBoundaries(data);
     smoothPitchBoundaries(data.senseGroups||[]);
-    S.data=data; collapseCards(); render(data); setStatus('');
+    S.data=data; collapseCards(); render(data);
+    document.getElementById('result-wrap').classList.remove('stale');
+    setStatus('');
     document.getElementById('result-wrap').style.display='block';
-  }catch(e){setStatus('❌ '+e.message,true);}
+  }catch(e){
+    document.getElementById('result-wrap').classList.remove('stale');
+    setStatus('❌ '+e.message,true);
+  }
   finally{document.getElementById('analyze-btn').disabled=false;document.getElementById('analyze-btn').textContent='▶ 分析';}
 }
 
