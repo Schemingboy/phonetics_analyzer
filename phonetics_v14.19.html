@@ -1160,7 +1160,7 @@ function wordHasSchwaCue(word, seg){
   if(!key) return false;
   const source=[word.writtenIpa,seg?.naturalIpa].filter(Boolean).join(' ');
   if(SCHWA_FUNCTION_WORDS.has(key)) return textHasSchwa(source);
-  if(SCHWA_CONTENT_WORDS.has(key)) return textHasSchwa(source)||['about','support','today','again','around','away'].includes(key);
+  if(SCHWA_CONTENT_WORDS.has(key)) return textHasSchwa(source);
   return false;
 }
 
