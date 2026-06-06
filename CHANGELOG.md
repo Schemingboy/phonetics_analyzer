@@ -1,6 +1,6 @@
 # 版本更迭与 Bug 修复记录
 
-更新时间：2026-06-04
+更新时间：2026-06-07
 
 ## 当前主线
 
@@ -28,12 +28,22 @@
 - 不改变 FLOW 主现象、segment 边界、TTS 文本、`stressed`、`pitchContour` 或 AI 数据结构。
 - `PROJECT.md` 更新当前版本、CUES 层规则和访问 URL。
 
+Batch 1 — 零风险 bug 修复（2026-06-07）：
+
+- 修复 `elision` 删除线颜色：`.elided-char` 和图例 `.leg-s` 改用 `--c-elision`，与弱化灰色区分。
+- 示例句按钮点击后直接填入文本并触发 `analyze()`，减少一步手动操作。
+- 修复 `wordHasSchwaCue` 恒真问题：`SCHWA_CONTENT_WORDS` 命中后仍必须由 IPA 内容确认 schwa。
+- 删除 `STORE.fields` 中没有 DOM 对应的 `prompt-version` 幽灵 key；`pa_prompt_version` 仍由专门逻辑读写。
+- 分析加载期间给旧结果区添加 `.stale` 半透明遮罩，成功或失败后移除，避免用户误把旧结果当新结果。
+
 验证：
 
 - JavaScript 脚本语法检查通过。
 - 代码级检查通过：v14.19 页面标题、CORS URL、`PROMPT_VERSION` 和新增 CUES 图例均已更新。
 - 代码级检查通过：已加入 liaison segment 内部边界校验，`he stole it` 这类模型过度合并会保留合法的 `stole‿it`，拆掉非法的 `he‿stole`。
-- 待页面级 smoke test：打开 `http://127.0.0.1:8765/phonetics_v14.19.html`，确认 CUES 提示轻量显示且不与现有标注重叠。
+- Batch 1 代码级检查通过：目标 CSS、示例句点击、schwa cue、STORE 字段和 stale overlay 均已落在 `phonetics_v14.19.html`。
+- 页面级轻量 smoke test 通过：Codex 内置浏览器打开 `http://127.0.0.1:8765/phonetics_v14.19.html`，标题、输入框、结果区和 `.stale` 样式规则正常，控制台无错误。
+- 待真实 API 回归：确认 CUES 提示轻量显示且不与现有 FLOW 标注重叠。
 - 后续 UX 计划：系统提示词编辑区默认隐藏，普通用户界面不提供入口；仅保留开发者打开方式，用于调试 prompt 和缓存版本。
 
 ## v14.18
