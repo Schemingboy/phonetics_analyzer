@@ -52,6 +52,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ── Result ── */
 #result-wrap{display:none;}
+#result-wrap.stale{opacity:.35;pointer-events:none;}
 
 /* View toggle + accent */
 .result-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;flex-wrap:wrap;}
@@ -1707,6 +1708,7 @@ async function analyze(){
   const sentence=document.getElementById('s-input').value.trim(),cfg=getCfg();
   if(!sentence){setStatus('请输入句子');return;}
   if(!cfg.key){setStatus('请在 API 设置中填入 Key',true);return;}
+  document.getElementById('result-wrap').classList.add('stale');
   S.sentence=sentence; stopSpeech();
   document.getElementById('analyze-btn').disabled=true;
   document.getElementById('analyze-btn').textContent='分析中…';
@@ -1717,9 +1719,14 @@ async function analyze(){
     data=stabilizeAnalysisData(data,sentence,getAccent());
     data=fixContrastSenseGroupBoundaries(data);
     smoothPitchBoundaries(data.senseGroups||[]);
-    S.data=data; collapseCards(); render(data); setStatus('');
+    S.data=data; collapseCards(); render(data);
+    document.getElementById('result-wrap').classList.remove('stale');
+    setStatus('');
     document.getElementById('result-wrap').style.display='block';
-  }catch(e){setStatus('❌ '+e.message,true);}
+  }catch(e){
+    document.getElementById('result-wrap').classList.remove('stale');
+    setStatus('❌ '+e.message,true);
+  }
   finally{document.getElementById('analyze-btn').disabled=false;document.getElementById('analyze-btn').textContent='▶ 分析';}
 }
 
