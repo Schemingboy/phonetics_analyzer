@@ -4,9 +4,51 @@
 
 ## 当前主线
 
-最新工作版本：`phonetics_v14.19.html`
+最新本地工作版本：`phonetics_v14.22.html`
 
 当前策略：继续用 v14.x 小版本修稳定性和教学显示问题；当核心回归句稳定后，再封 `phonetics_v15.html`。
+
+## v14.22 - Review Batch 3 rendering and TTS usability
+
+时间：2026-06-07
+
+目标：完成审查报告 Batch 3 的渲染逻辑和 TTS 可用性修复，让 `lost_plosive` 的视觉语义更清楚，并让朗读控制与当前标注区对齐。
+
+主要变化：
+- 新建并同步 `phonetics_v14.22.html` 到主文件夹，基于已完成的 `phonetics_v14.21.html`。
+- 页面版本号、CORS 提示 URL 和 `PROMPT_VERSION` 升级为 `v14.22-review-batch3`。
+- `lost_plosive` 从 CSS 伪元素斜杠改为 `˺` 上标：删除 `.lost-plosive-char::after`，并在 `renderSegment()` 中给词尾爆破音字母追加青绿色 `˺`。
+- FLOW 图例同步显示 `d˺ hold`，与正文渲染一致。
+- TTS 引擎选择器从折叠的 API 设置卡移到结果区 `.audio-section`，与 Play 按钮和倍速控制放在同一视觉区域。
+- browser TTS 播放时基于 `SpeechSynthesisUtterance.boundary` 的 `charIndex` 映射当前 sense group，并给 `.sg-wrap-item` 加 `.playing` 浅蓝背景。
+- OpenAI / ElevenLabs / Typecast TTS 暂不做 word-level 时间轴映射；MVP 为播放开始高亮第一个 sense group，播放结束、停止或错误后清除。
+- 真实 API 回归后追加修复：多词 `lost_plosive` segment 只给边界前的词加 `˺`；单词 segment 仍正常标自身，避免 `hot dog` 被显示成 `hot˺ dog˺`。
+- 不改变 AI JSON 结构、Prompt 规则正文、FLOW 主现象判断、TTS 文本或 `index.html`。
+
+验证：
+- 静态检查通过：`phonetics_v14.22.html` 中不再存在 `.lost-plosive-char::after`、`v14.21`、`phonetics_v14.21` 或 `review-batch2` 残留。
+- 静态检查通过：`id="tts-engine"` 和 `id="tts-engine-hint"` 均只有一个，且已位于结果区 `.audio-section`。
+- JavaScript 脚本语法检查通过。
+- 页面级 DOM smoke test 通过：本地服务器打开 `http://127.0.0.1:8766/phonetics_v14.22.html`，页面标题为 v14.22，FLOW 图例显示 `d˺`，TTS 引擎选择器在 `.audio-section` 内且不在 `api-body` 内，控制台无错误或警告。
+- 真实 API 回归通过（DeepSeek `deepseek-chat`）：`hot dog` 渲染为 `hot˺ dog`；`good morning` 渲染为 `good˺ morning`；`I wanted to go, but I changed my mind.` 返回 2 个 sense group；`I need all of it out of the oven in about an hour.` 返回 3 个 sense group，连读小块正常，语调曲线 path 非空。
+
+## v14.21 - Review Batch 2 UI cleanup
+
+时间：2026-06-07
+
+目标：完成审查报告 Batch 2 的 3 个独立 UI / JS 清理任务，并将版本命名为 `v14.21`。Batch 1 对应 `v14.20`，Batch 2 对应 `v14.21`。
+
+主要变化：
+- 新建并同步 `phonetics_v14.21.html` 到主文件夹，保留 GitHub 入口 `index.html` 为 `v14.15`，不更新线上入口。
+- 无 API Key 点击分析时，自动展开 API 设置卡，状态提示改为 `请在 API 设置中填入 Key ↓`，并滚动到 Key 输入框。
+- 将 FLOW / CUES 图例移动到意群标注区上方，紧跟结果区视图切换按钮之后，方便边看图例边对照标注。
+- 清理 `populateELSelect` 内残留废代码：删除未使用的推荐 optgroup、无效 `addOpt` 调用和死函数，保留 ElevenLabs 推荐 / 其他音色分组逻辑。
+
+验证：
+- JavaScript 语法检查通过。
+- `git diff --check` 通过。
+- 页面级验证通过：无 Key 时 API 设置自动展开并定位到 Key 输入框；FLOW / CUES 图例位于 `#sg-row` 上方；ElevenLabs 音色下拉列表正常显示。
+- 主文件夹 `index.html` 确认仍为 `v14.15`。
 
 ## v14.19
 
@@ -494,4 +536,4 @@ svg.setAttribute('class','sg-local-svg');
 - v14.9 长句边界和曲线显示需要实测。
 - `the + vowel` 暂不显示为普通连读链，但是否需要轻提示 `the -> /ði/` 可作为后续 UX 讨论。
 - 未来封 v15 前，应统一更新 `index.html` 指向稳定版本。
-- 当前所有版本文件均未进入 Git 跟踪状态，提交前需先确认哪些文件应纳入版本控制。
+- `phonetics_v14.21.html` 已进入主文件夹本地提交，`phonetics_v14.22.html` 已同步到主文件夹；后续版本文件是否纳入版本控制，仍需按任务范围单独确认。
