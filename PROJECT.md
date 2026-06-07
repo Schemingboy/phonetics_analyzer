@@ -10,12 +10,13 @@
 
 ## 当前状态
 
-- 当前主文件夹最新已收尾版本：`phonetics_v14.22.html`
+- 当前最新工作版本：`phonetics_v14.23.html`
 - 当前稳定化方向：继续打磨 v14.x，稳定后封 `phonetics_v15.html`
 - 版本递增规则：新增功能或规则体系变化才开新小版本；当前版本的显示优化、文案调整、样式微调和 bug 修复直接改当前文件，并记录到 `CHANGELOG.md`。
 - `v14.19` Batch 1 零风险 bug 修复已完成并推送：elision 颜色区分、示例句点击触发分析、schwa cue 恒真修复、删除 STORE 幽灵 key、分析中 stale 遮罩。
 - `v14.21` Review Batch 2 已同步到主文件夹并做本地提交：无 API Key 时展开 API 设置卡、FLOW / CUES 图例上移、清理 ElevenLabs 音色下拉废代码。
 - `v14.22` Review Batch 3 已同步到主文件夹：`lost_plosive` 改为 `˺` 上标、TTS 引擎选择器移到结果区、browser TTS 播放时高亮当前意群。
+- `v14.23` Batch 4 Prompt 扩充已同步到主文件夹：自定义 Prompt 增加保护标记、`intrusive_r` 降为英式低优先级可选规则、H-dropping 归入 `assimilation` Prompt 子规则。
 - GitHub 入口 `index.html` 暂时继续保留 `v14.15`，本地新版文件不自动更新线上入口。
 - 当前入口文档：
   - `PROJECT.md`：项目说明
@@ -80,7 +81,7 @@ AI 返回的核心结构：
 | `lost_plosive` | P2 | 失去爆破 |
 | `flapping` | P2 | 美式闪音 |
 | `contraction` | P1 | 高频口语缩约 |
-| `intrusive_r` | P2 | 英式闯入 r |
+| `intrusive_r` | P3 | 英式闯入 r（低优先级可选） |
 
 ## 视觉规则
 
@@ -124,6 +125,8 @@ I | need | all‿of‿it | out‿of | the oven(普通相邻词) | in‿about | a
 - `contraction` 默认只标输入文本里已经写成缩约或口语词形的块，例如 `I'm / gonna / wanna / lemme`；不要在默认主标注里把标准写法 `I am / going to / want to / let me` 强行改写成更口语的读法。
 - 默认主标注优先服务“当前文本和 TTS 大概率真的听得到”的 heard layer；`want to -> wanna` 这类可选口语读法以后应放入 optional cue layer，而不是默认层。
 - `elision` 是通用省音规则：任何明确省掉、且值得教学标记的声音都用同一种删除线视觉表示；`next day` 的词尾 `t` 省略、`asked him -> asked 'im` 的功能词 `h` 省略只是例子，不是规则边界。
+- H-dropping 作为 `assimilation` 的 Prompt 子规则处理：按发音判断辅音结尾词，后接非重读 `he / him / her / his / have / has / had` 时，可整体标为紫色 `assimilation` segment，并在 IPA 中显示 H 脱落后的连接读法，例如 `call him -> /kɔːl ɪm/`；元音结尾词后不套用，例如 `I saw him` 不标为同化。
+- `intrusive_r` 降为英式低优先级可选规则；American 不标，不确定时跳过。
 - 代码里的 pinned liaison fallback chunk 只用于“模型给出过长 liaison chain 时拆回可读小块”，不是 liaison 规则全集；普通 liaison 仍由通用边界规则判断。
 
 ### Lost Plosive
@@ -164,7 +167,7 @@ python -m http.server 8765 --bind 127.0.0.1
 访问：
 
 ```text
-http://127.0.0.1:8765/phonetics_v14.22.html
+http://127.0.0.1:8765/phonetics_v14.23.html
 ```
 
 ## 测试路线
@@ -177,7 +180,7 @@ http://127.0.0.1:8765/phonetics_v14.22.html
 
 ## 下一步建议
 
-v14.22 已完成 Batch 3 渲染逻辑 + TTS 可用性修复，并已完成真实 API 页面回归。当前重点转向架构稳定化：优先处理 B-6，用 `ResizeObserver` 替换双 RAF + `setTimeout` 的曲线重绘方案。
+v14.23 已完成 Batch 4 Prompt 扩充、自定义 Prompt 保护和 H-dropping 真实 API 回归。当前重点转回架构稳定化：优先处理 B-6，用 `ResizeObserver` 替换双 RAF + `setTimeout` 的曲线重绘方案。
 
 已回归的重点：
 
@@ -221,6 +224,7 @@ v14.22 已完成 Batch 3 渲染逻辑 + TTS 可用性修复，并已完成真实
 - `I'm going to go.` 只把文本里已经写出的 `I'm` 标为 contraction，不把 `going to` 默认改成 `gonna`。
 - `I wanna go.` 可稳定显示 `wanna -> /ˈwɑːnə/`。
 - `Lemme see it.` 可稳定显示 `Lemme -> /ˈlemi/`，并保留 `see‿it` 连读。
+- H-dropping 真实 API 回归通过：`call him / tell her / give him a call` 能触发 `assimilation`，`He called me.` 不触发；`I saw him.` 初次误标后已通过 Prompt 反例修正。
 
 后续计划：
 
@@ -228,7 +232,7 @@ v14.22 已完成 Batch 3 渲染逻辑 + TTS 可用性修复，并已完成真实
 - 重点检查 `focus cue` 是否每个 sense group 最多一个，不变成课堂式多义对比面板。
 - 封版前再做一轮浏览器页面级 smoke test：页面加载、内置测试组、语调曲线、`| pause`、CUES 提示、TTS 设置区不报错。
 - 后续 UX 调整：系统提示词编辑区默认隐藏，普通用户界面不提供入口；仅保留开发者打开方式，用于调试 prompt 和缓存版本。
-- 决定是否把 `index.html` 指向 v14.22；如果要对外使用，优先做这一步。
-- 如果 v14.22 继续稳定，再复制封为 `phonetics_v15.html`，并把 v14.22 保留为回退基线。
+- 决定是否把 `index.html` 指向 v14.23；如果要对外使用，优先做这一步。
+- 如果 v14.23 继续稳定，再复制封为 `phonetics_v15.html`，并把 v14.23 保留为回退基线。
 - `glottal stop` 暂缓；它口音差异更大，且容易和 `lost_plosive` 视觉含义冲突。
 - `thought group cue` 后续可考虑加入更明确的停顿时长或一句式提示，但不进入 FLOW 主图例。

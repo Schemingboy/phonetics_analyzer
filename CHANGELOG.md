@@ -4,9 +4,46 @@
 
 ## 当前主线
 
-最新本地工作版本：`phonetics_v14.22.html`
+最新工作版本：`phonetics_v14.23.html`
 
 当前策略：继续用 v14.x 小版本修稳定性和教学显示问题；当核心回归句稳定后，再封 `phonetics_v15.html`。
+
+## v14.23
+
+目标：Batch 4 Prompt 扩充，保护用户自定义 Prompt，并补强 H-dropping 教学覆盖；本批只改 Prompt、Prompt 缓存保护和版本文档，不改前端渲染逻辑。
+
+主要变化：
+
+- 新建 `phonetics_v14.23.html`，基于 `phonetics_v14.22.html` 复制。
+- 页面版本号、CORS 提示 URL 和 `PROMPT_VERSION` 升级为 `v14.23-prompt-batch4`。
+- 为系统 Prompt 编辑框增加 `pa_prompt_is_custom` 保护标记：
+  - 用户手动编辑 `#sp-ta` 时写入 `pa_prompt_is_custom = '1'`。
+  - 点击“重置提示词”恢复默认 Prompt 时清除该标记。
+  - 默认 Prompt 自动升级时跳过已标记的自定义 Prompt，避免误判后静默覆盖。
+- 默认 Prompt 自动升级发生时显示状态提示：`提示词已自动升级至最新版本`。
+- `intrusive_r` 在 `DEFAULT_SP` 中降为英式低优先级可选规则；American 不标，不确定时跳过。
+- 在 `assimilation` 的 Prompt 说明中追加 H-dropping 子规则：辅音结尾词 + 非重读 `he/him/her/his/have/has/had` 时，整体标为 `assimilation`，`naturalIpa` 显示 H 脱落后的连接读法。
+- 真实 API 回归后追加收紧：H-dropping 的 consonant-final 必须按发音判断，不按拼写判断；`I saw him` 作为反例，避免把元音结尾的 `saw him` 误标为 `assimilation`。
+- 不改变 phenomenon enum、颜色表、图例、`renderSegment()`、TTS、AI JSON 结构或 `index.html`。
+
+验证：
+
+- 静态检查通过：`phonetics_v14.23.html` 不再残留 `phonetics_v14.22.html`、`v14.22-review-batch3`、`review-batch3`、`v14.21` 或 `review-batch2`。
+- 静态检查通过：`PROMPT_VERSION` 为 `v14.23-prompt-batch4`，`DEFAULT_SP` 包含 `H-dropping`、`call him`、`tell her`、`LOW PRIORITY` 和 `Do NOT mark in American accent`。
+- 差异检查通过：相对 v14.22，只改页面版本标识、Prompt 文本、Prompt 缓存保护、`resetSP()` 清理标记和 `_statusTimer` 初始化顺序；未改 `renderSegment()`、颜色表、图例、TTS、AI JSON 结构或 `index.html`。
+- JavaScript 脚本语法检查通过。
+- Prompt 缓存逻辑模拟验证通过：
+  - 空缓存会自动写入 v14.23 默认 Prompt，包含 H-dropping 和 intrusive_r 低优先级规则，并显示自动升级提示。
+  - 带 `pa_prompt_is_custom = '1'` 的旧版相似自定义 Prompt 不会被覆盖。
+  - 用户编辑 `#sp-ta` 会保存 Prompt 并写入 `pa_prompt_is_custom = '1'`。
+  - `resetSP()` 会写回 v14.23 默认 Prompt、更新 `pa_prompt_version` 并清除 `pa_prompt_is_custom`。
+- 页面级 smoke test 通过：本地服务器打开 `http://127.0.0.1:8767/phonetics_v14.23.html`，页面标题和 header 均显示 v14.23，控制台无 error/warning。
+- 真实 API 回归通过（DeepSeek `deepseek-chat`，页面已有 Key 配置，手动刷新到 v14.23 默认 Prompt 后测试）：
+  - `call him` 返回并渲染为单个 `assimilation` segment，IPA `/kɔːl ɪm/`，页面显示中文标签 `同化`。
+  - `tell her` 返回并渲染为单个 `assimilation` segment，IPA `/tɛl ɜr/`，页面显示中文标签 `同化`。
+  - `give him a call` 返回并渲染为 `give him` 的 `assimilation` segment，IPA `/ɡɪv ɪm/`，`a / call` 保持普通词。
+  - 对照句 `He called me.` 保持普通词，不触发 H-dropping。
+  - 对照句 `I saw him.` 初次回归被误标为 `assimilation`；补充“按发音判断 consonant-final，不按拼写判断”和 `I saw him` 反例后复测通过，不再显示同化标签。
 
 ## v14.22 - Review Batch 3 rendering and TTS usability
 
