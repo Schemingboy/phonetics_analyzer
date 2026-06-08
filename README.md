@@ -28,13 +28,13 @@ python -m http.server 8765 --bind 127.0.0.1
 http://127.0.0.1:8765/index.html
 ```
 
-本地开发/测试最新工作版可直接访问：
+当前 GitHub 公开入口：
 
 ```
-http://127.0.0.1:8765/phonetics_v14.19.html
+http://127.0.0.1:8765/index.html
 ```
 
-当前工作版 `phonetics_v14.19.html` 已完成首轮零风险 bug 修复，适合继续做真实 API 页面回归。
+当前公开入口 `index.html` 保留 v14.15。后续版本和本地工作资料不进入 GitHub 公开仓库。
 
 > 不要直接双击 HTML 用 `file://` 打开，否则 API 请求会被 CORS 拦截。
 
@@ -50,13 +50,10 @@ http://127.0.0.1:8765/phonetics_v14.19.html
 
 ```
 .
-├── index.html              ← GitHub Pages 入口（指向 v14.15）
-├── phonetics_v14.19.html   ← 当前本地工作版本
-├── phonetics_v14.15.html   ← 已推送稳定版本
+├── index.html              ← GitHub Pages / 公开入口（v14.15）
 ├── README.md
 ├── LICENSE
-├── .gitignore
-└── old version/            ← 历史版本（仅本地保留）
+└── .gitignore
 ```
 
 ## License

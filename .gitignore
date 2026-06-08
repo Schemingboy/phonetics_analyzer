@@ -8,6 +8,8 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+.editorconfig
+.gitattributes
 
 # Node
 node_modules/
@@ -16,8 +18,17 @@ node_modules/
 *.tmp
 *.log
 
-# Old versions (local only)
-old version/
+# Local workspace docs (not pushed to GitHub)
+AGENTS.md
+PROJECT.md
+CHANGELOG.md
+docs/
+
+# Archived local files
+archive/
+
+# Version HTML files
+phonetics_v*.html
 
 # Codegraph index
 .codegraph/
